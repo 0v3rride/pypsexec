@@ -5,6 +5,19 @@
 [![AppVeyor Build](https://ci.appveyor.com/api/projects/status/github/jborean93/pypsexec?svg=true)](https://ci.appveyor.com/project/jborean93/pypsexec)
 [![Coverage](https://coveralls.io/repos/jborean93/pypsexec/badge.svg)](https://coveralls.io/r/jborean93/pypsexec)
 
+## Purpose
+Create a modified version of JBorean93's implementation that would allow for remote code execution on the remote host via misconfigured Windows SMB shares. This has been partly acheived. There are two main parts to how pypsexec works that were modified in the client.py module:
+
+1. Added a protected field named share that would allow the user to specify any share on the remote host to drop the PAexec payload into in which they have access to due to misconfiguration, weak credentials, etc.
+
+2. Modified the lines that create the accompanying service. The service that is create is required to allow for remote code execution to take place and should point to the same directory where the PAexec executable is located based on user input from point 1. The lines that create the service are located in the create_service method under the Client class in the client.py module.
+
+The problem with point 2 is that it's difficult to determine the absolute path of non-default share. Where as default shares like ADMIN$, C$ or sometimes Users have predefined, or well-known absolute paths in the file system like C:\Windows for ADMIN$, C:\ for C$ or C:\Users for Users.
+
+However, I'm currently looking into some different solutions that could help me solve the problem with point 2. This includes remotely querying a host with WQL via WMIC or CIM with the [Win32_Share class](https://docs.microsoft.com/en-us/windows/win32/cimwin32prov/win32-share).
+
+
+## Native Information From JBorean93
 This library can run commands on a remote Windows host through Python. This
 means that it can be run on any host with Python and does not require any
 binaries to be present or a specific OS. It uses SMB/RPC to executable commands
