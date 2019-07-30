@@ -28,6 +28,12 @@ else:
 
 log = logging.getLogger(__name__)
 
+dir_map = {
+    "ADMIN" : r"%SystemRoot%",
+    "C" : r"%SystemDrive%",
+    "Users" : r"C:\Users"
+}
+
 
 class Client(object):
 
@@ -109,16 +115,8 @@ class Client(object):
 
         # create the PAExec service
         # added ---------------------------------------------------------------
-        path_root = "SystemRoot";
-
-        if self._share.find("ADMIN") > -1:
-            path_root = r"%SystemRoot%";
-        elif self._share.find("Users") > -1:
-            path_root = r"C:\Users";
-        else:
-            path_root = r"%SystemDrive%";
-
-        # netlogon C:\Windows\SYSVOL_DFSR\sysvol\<domainname>\SCRIPTS
+        path_root = r"%SystemRoot%";
+        path_root = dir_map.get(self._share.strip("$\n\r\t"), r"%SystemRoot%");
         # added ---------------------------------------------------------------
 
         service_path = r'"{}\{}" -service'.format(path_root, self._exe_file) # added
